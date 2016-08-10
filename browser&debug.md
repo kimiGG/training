@@ -1,34 +1,28 @@
 浏览器原理
+-------------
 
 http://kb.cnblogs.com/page/129756/
 
 http://www.html5rocks.com/zh/tutorials/internals/howbrowserswork/
 
-DOM
-
+######DOM
  
 
 DOM对象是浏览器解析HTML脚本生成的，最终输出一个树状结构的对象。
 
-CSSOM
-
- 
+######CSSOM
 
 CSSOM对象是浏览器解析CSS脚本生成的，最终也是输出类似DOM的树状结构。
 
-RenderTree
+######RenderTree
 
- 
 
 DOM 与 CSSOM 融合成一棵RenderTree（渲染树），随后计算每个可见元素的布局，并输出给绘制过程，在屏幕上渲染像素。优化这里的每一步对实现最佳渲染性能至关重要。
 
 并不是DOM中所有元素都会出现在RenderTree中，比如head，meta,script等标签，伪类，伪元素，又或者是结合CSS属性，比如display:none的节点及其子节点都不会在渲染树中出现。
 
 
-
- 
-
-布局
+######布局
 
  
 
@@ -36,7 +30,7 @@ DOM 与 CSSOM 融合成一棵RenderTree（渲染树），随后计算每个可�
 
  
 
-绘制
+######绘制
 
  
 
@@ -44,12 +38,11 @@ DOM 与 CSSOM 融合成一棵RenderTree（渲染树），随后计算每个可�
 
  
 
-合并渲染层
-
- 
+######合并渲染层
 
 来到这里，浏览器的渲染过程就接近尾声。每个图层绘制完，浏览器会将其按照合理的顺序合并到同一图层，并显示在浏览器上。
 
+![render](https://github.com/beop/training/blob/master/image/renderTree.jpg?raw=true)
  
 
 https://developers.google.com/web/fundamentals/performance/critical-rendering-path/render-tree-construction?hl=zh-cn
@@ -61,24 +54,24 @@ https://github.com/zhangyaowu/CN-Chrome-DevTools/blob/master/md/Performance-Prof
  
 
 调试技巧
+-------------
 
- 
+* 常见工具使用
 
-1.常见工具使用
+* Debugger
 
-2.Debugger
+* DOM断点
 
-3.DOM断点
+* 条件断点
 
-4.条件断点
+* 事件监听器断点
 
-5.事件监听器断点
+* Source修改版本回退右键打开Local Modifications
 
-6.Source修改版本回退右键打开Local Modifications
+* Snippet 比如html to script
 
-7.Snippet 比如html to script
-
-·(function() {
+```javascript
+(function() {
 
   var url = location;
 
@@ -103,29 +96,29 @@ https://github.com/zhangyaowu/CN-Chrome-DevTools/blob/master/md/Performance-Prof
  
 
 })();
+```
 
-8.$0
+* $0
 
-9.Async调试
+* Async调试
 
-10.iframe 调试 切换
+* iframe 调试 切换
 
-11.常用快捷键
+* 常用快捷键
 
-Ctrl + Shift + J:进入console面板
+    Ctrl + Shift + J:进入console面板
+    
+    ctrl+p 项目中定位文件
+    
+    ctrl+shif+o 文件中定位成员函数
+    
+    ctrl+g 行数
+    
+    Ctrl +Shift+E 被选中代码在控制台中打印出console信息
+    
+    Ctrl + F: 搜索内容
+    
+    Ctrl + Shift + F: 在所有代码中搜索
 
-ctrl+p 项目中定位文件
-
-ctrl+shif+o 文件中定位成员函数
-
-ctrl+g 行数
-
-Ctrl +Shift+E 被选中代码在控制台中打印出console信息
-
-Ctrl + F: 搜索内容
-
-Ctrl + Shift + F: 在所有代码中搜索
-
- 
 
 https://segmentfault.com/a/1190000000481884
