@@ -14,20 +14,20 @@ Javascript语言的执行环境是"单线程"（single thread.
 
 
 1.  回调函数
-```javascript
-//假定有两个函数f1和f2，后者等待前者的执行结果。
-f1();
-f2();
-//如果f1是一个很耗时的任务，可以考虑改写f1，把f2写成f1的回调函数。
-function f1(callback){
-　　setTimeout(function () {
-　　　　// f1的任务代码
-　　　　callback();
-　　}, 1000);
-}
-//执行代码就变成下面这样
-f1(f2);
-```
+    ```javascript
+    //假定有两个函数f1和f2，后者等待前者的执行结果。
+    f1();
+    f2();
+    //如果f1是一个很耗时的任务，可以考虑改写f1，把f2写成f1的回调函数。
+    function f1(callback){
+    　　setTimeout(function () {
+    　　　　// f1的任务代码
+    　　　　callback();
+    　　}, 1000);
+    }
+    //执行代码就变成下面这样
+    f1(f2);
+    ```
     采用这种方式，我们把同步操作变成了异步操作，f1不会堵塞程序运行，相当于先执行程序的主要逻辑，将耗时的操作推迟执行。
     
     优点:简单、容易理解和部署
@@ -35,58 +35,70 @@ f1(f2);
     缺点:不利于代码的阅读和维护，各个部分之间高度耦合（Coupling），流程会很混乱，而且每个任务只能指定一个回调函数。
 
 2.  事件监听
-```javascript
-f1.on('done', f2);
-function f1(){
-　　setTimeout(function () {
-　　　　// f1的任务代码
-　　　　f1.trigger('done');
-　　}, 1000);
-}
+    ```javascript
+    f1.on('done', f2);
+    function f1(){
+    　　setTimeout(function () {
+    　　　　// f1的任务代码
+    　　　　f1.trigger('done');
+    　　}, 1000);
+    }
 ```
     优点:比较容易理解，可以绑定多个事件，每个事件可以指定多个回调函数，而且可以"去耦合"（Decoupling），有利于实现模块化。
 
     缺点:整个程序都要变成事件驱动型，运行流程会变得很不清晰。
 3. 发布/订阅
-```javascript
-//首先，f2向"信号中心"jQuery订阅"done"信号。
-jQuery.subscribe("done", f2);
-function f1(){
-　　setTimeout(function () {
-　　　　// f1的任务代码
-　　　　jQuery.publish("done");
-　　}, 1000);
-}
-//jQuery.publish("done")的意思是，f1执行完成后，向"信号中心"jQuery发布"done"信号，从而引发f2的执行。
-//取消订阅（unsubscribe）
-jQuery.unsubscribe("done", f2);
-```
-这种方法的性质与"事件监听"类似，但是明显优于后者。因为我们可以通过查看"消息中心"，了解存在多少信号、每个信号有多少订阅者，从而监控程序的运行。
+    ```javascript
+    //首先，f2向"信号中心"jQuery订阅"done"信号。
+    jQuery.subscribe("done", f2);
+    function f1(){
+    　　setTimeout(function () {
+    　　　　// f1的任务代码
+    　　　　jQuery.publish("done");
+    　　}, 1000);
+    }
+    //jQuery.publish("done")的意思是，f1执行完成后，向"信号中心"jQuery发布"done"信号，从而引发f2的执行。
+    //取消订阅（unsubscribe）
+    jQuery.unsubscribe("done", f2);
+    ```
+    这种方法的性质与"事件监听"类似，但是明显优于后者。因为我们可以通过查看"消息中心"，了解存在多少信号、每个信号有多少订阅者，从而监控程序的运行。
 
 4. Promises对象
-思想:每一个异步任务返回一个Promise对象，该对象有一个then方法，允许指定回调函数
-```javascript
-f1().then(f2);
-function f1(){
-　　var dfd = $.Deferred();
-　　setTimeout(function () {
-　　　　// f1的任务代码
-　　　　dfd.resolve();
-　　}, 500);
-　　return dfd.promise;
-}
-```
-    优点:回调函数变成了链式写法，程序的流程可以看得很清楚，而且有一整套的配套方法，可以实现许多强大的功能.如果一个任务已经完成，再添加回调函数，该回调函数会立即执行。所以，你不用担心是否错过了某个事件或信号
+    思想:每一个异步任务返回一个Promise对象，该对象有一个then方法，允许指定回调函数
 
+    promise对象是CommonJS工作组提供的一种规范，用于异步编程的统一接口。
+    
+    promise对象通常实现一种then的方法，用来在注册状态发生改变时作为对应的回调函数。
+    
+    promise模式在任何时刻都处于以下三种状态之一：未完成（unfulfilled）、已完成（resolved）和拒绝（rejected）
+
+    ```javascript
+    f1().then(f2);
+    function f1(){
+    　　var dfd = $.Deferred();
+    　　setTimeout(function () {
+    　　　　// f1的任务代码
+    　　　　dfd.resolve();
+    　　}, 500);
+    　　return dfd.promise;
+    }
+    ```
+    优点:回调函数变成了链式写法，程序的流程可以看得很清楚，而且有一整套的配套方法，可以实现许多强大的功能.如果一个任务已经完成，再添加回调函数，该回调函数会立即执行。所以，你不用担心是否错过了某个事件或信号
+    
     缺点:编写和理解，都相对比较难
-```javascript
-//定多个回调函数
-f1().then(f2).then(f3);
-//指定发生错误时的回调函数
-f1().then(f2).fail(f3);
-```
+        
+    ```javascript
+    //定多个回调函数
+    f1().then(f2).then(f3);
+    //指定发生错误时的回调函数
+    f1().then(f2).fail(f3);
+    ```
 
 ######引用
 [Javascript异步编程的4种方法](http://www.ruanyifeng.com/blog/2012/12/asynchronous%EF%BC%BFjavascript.html)
+
+[谈谈使用promise时候的一些反模式](http://www.tuicool.com/articles/FvyQ3a)
+
+[JavaScript异步编程的Promise模式](http://www.infoq.com/cn/news/2011/09/js-promise/)
 
 [Asynchronous JS: Callbacks, Listeners, Control Flow Libs and Promises](http://sporto.github.io/blog/2012/12/09/callbacks-listeners-promises/)
